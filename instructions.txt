@@ -1,0 +1,39 @@
+download wiktionary article dump from https://wikimedia.mirror.clarkson.edu/enwiktionary/20231020/
+place in ./source-data-ignore
+decompress with bzip2 -d
+$ mkdir ./source-data-ignore/pages
+$ cd  ./source-data-ignore/pages
+$ csplit -k -n 10 ../enwiktionary-20231020-pages-articles.xml '/.*<page>.*/' '{8705923}' #Hi Zalgo!
+$ for i in 1 2 3 4 5 6 7 8 9 0; do for j in 1 2 3 4 5 6 7 8 9 0; do for k in 1 2 3 4 5 6 7 8 9 0; do echo ${i}${j}${k}; mkdir ${i}${j}${k}; mv xx*${i}${j}${k} ./${i}${j}${k}/; done; done; done
+$ mkdir ../latin-pages
+$ for i in *; do mkdir ../latin-pages/$i; done
+$ for i in *; do echo $i; for j in `grep -srl '==Latin==' $i`; do mv $j ../latin-pages/${j}.xml; done; done
+
+8.2G	../enwiktionary-20231020-pages-articles.xml
+4.7G	../latin-pages
+ 15M	../latin-pages-only.xml
+ 31G	../pages
+
+$ cd ..
+$ rm -rf pages
+$ mkdir lemmata
+$ cd lemmata
+$ for i in ../latin-pages/*; do echo $i; for j in $i/*.xml; do ../../source/python/latin-from-pages.py $j; done; done #this takes a few hours
+$ mkdir ../analysis
+$ rm ../analysis/alltext.txt; for i in *.txt; do echo $i; cat $i | grep . >> ../analysis/alltext.txt; done #this takes maybe 20 minutes or so
+$ cd ../analysis
+$ sed 's/{{/\n{{/g' alltext.txt > nltext.txt
+$ ../../source/python/clean-alltext.py nltext.txt > cleaned.txt
+
+
+
+
+--ALT--
+$ mkdir splits
+$ cd splits
+$ csplit -k -n 8 ../enwiktionary-20231020-pages-articles.xml '/.*==Latin==.*/' '{824383}' #Hi Zalgo!
+$ for i in 0 1 2 3 4 5 6 7 8 9; do for j in 0 1 2 3 4 5 6 7 8 9; do mkdir ${i}${j}; mv xx*${i}${j} ${i}${j}/; done; done
+$ mkdir ../shaved
+$ for i in *; do mkdir ../shaved/$i; for j in $i/*; do gsed '0,/.*>/{s/.*>//}' $j | gsed  '0,/</{s/<.*//}' | gsed '/</,$d' > ../shaved/$j.xml; done; done
+$ cd ../shaved
+
