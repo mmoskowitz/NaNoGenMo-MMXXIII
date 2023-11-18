@@ -124,12 +124,18 @@ class Mood(Feature):
     SUBJUNCTIVE = "subj"
 
 @dataclass
+class Grammar:
+    def set_feature(self, feature):
+        pass
+
+
+@dataclass
 class Word:
+    infl: list[Grammar] = field(default_factory=list)
     text: str = None
     page: str = None
     meter: str = ""
     pos: str = None
-    grammar: str = ""
     head: str = None
     
 @dataclass
@@ -139,14 +145,19 @@ class Template:
     params: dict = field(default_factory = lambda: {})
 
 @dataclass
-class Grammar:
-    pass
-
-@dataclass
 class Noun(Grammar):
     gender: Gender = Gender.NEUTER
     casus: Casus = Casus.NOMINATIVE
     number: Number = Number.SINGULAR
+
+    def set_feature(self, feature):
+        match(feature):
+            case Gender():
+                self.gender = feature
+            case Casus():
+                self.casus = feature
+            case Number():
+                self.number = feature
 
 @dataclass
 class Adjective(Noun):
@@ -159,6 +170,20 @@ class Verb(Grammar):
     tense: Tense = Tense.PRESENT
     voice: Voice = Voice.ACTIVE
     mood: Mood = Mood.INDICATIVE
+
+    def set_feature(self, feature):
+        match(feature):
+            case Person():
+                self.person = feature
+            case Number():
+                self.number = feature
+            case Tense():
+                self.tense = feature
+            case Voice():
+                self.voice = feature
+            case Mood():
+                self.mood = feature
+    
     
 #default grammar value for each pos
 grammar_from_pos = {
@@ -178,8 +203,9 @@ def write_parsed(word):
         return
     if (word.pos is None):
         return
-    output_lines.append (",".join((word.text, word.meter, word.pos, word.grammar)))
-    print (output_lines[-1])
+    for infl in word.infl:
+            output_lines.append (",".join((word.text, word.meter, word.pos, str(infl))))
+            print (output_lines[-1])
 
 def read_template(line):
     #pull out text
@@ -211,6 +237,8 @@ def template_head(word, template):
     return word
 
 def template_infl_of(word, template):
+    print(word.text)
+    print(template)
     #get set of grammars
     sets = []
     set = []
@@ -221,15 +249,34 @@ def template_infl_of(word, template):
         else:
             #deal with values
             values = arg.split("//")
-            features = [string_to_feature(value) for value in values]
-            set.append(features)
+            print(values)
+            features = []
+            for value in values:
+                feature = string_to_feature(value)
+                if (feature is not None):
+                    features.append(feature)
+            if (len(features) > 0):
+                set.append(features)
     #store all sets and write each combination to a word
-    
     sets.append(set)
     print(sets)
+    for set in sets:
+        grammar = grammar_from_pos[word.pos]
+        set_to_infls(word, set, grammar)
     return word
 
-def set_to_words(word, set):
+#recursive
+def set_to_infls(word, set, grammar, index = 0):
+    if (len(set) > index):
+        #do something
+        features = set[index]
+        for feature in features:
+            grammar = copy.deepcopy(grammar)
+            grammar.set_feature(feature)
+            set_to_infls(word, set, grammar, index + 1)
+    else:
+        #add grammar to word
+        word.infl.append(grammar)
     pass
 
     
