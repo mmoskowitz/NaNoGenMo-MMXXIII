@@ -7,7 +7,7 @@ from enum import Enum, EnumMeta
 filename = sys.argv[1]
 
 linecount = 0
-maxlines = 1600
+maxlines = -1 #3200
 
 output_lines = []
 
@@ -209,10 +209,15 @@ def write_parsed(word):
 
 def read_template(line):
     #pull out text
-    text = re.match("{{(.*)}}", line).group(1)
+    possible_text = re.match("{{(.*)}}", line)
+    if (possible_text is None):
+        return None
+    text = possible_text.group(1)
     #split on |
     parts = text.split('|')
     #name is 0
+    print(line)
+    print(parts[0])
     template = Template(parts[0])
     for i in (range(1, len(parts))):
         part = (parts[i])
@@ -228,6 +233,8 @@ def read_template(line):
 def template_head(word, template):
     if (len(template.args) > 1):
         pos = template.args[1]
+        if (pos not in pos_from_head):
+            return word
         word.pos = pos_from_head[pos]
     if ('head' in template.params):
         if (word.head is not None):
@@ -261,8 +268,9 @@ def template_infl_of(word, template):
     sets.append(set)
     print(sets)
     for set in sets:
-        grammar = grammar_from_pos[word.pos]
-        set_to_infls(word, set, grammar)
+        if (word.pos in grammar_from_pos):
+            grammar = grammar_from_pos[word.pos]
+            set_to_infls(word, set, grammar)
     return word
 
 #recursive
@@ -282,6 +290,8 @@ def set_to_infls(word, set, grammar, index = 0):
     
 def parse_template(word, line):
     template = read_template(line)
+    if (template is None):
+        return word
     match (template.name):
         case "head":
             word = template_head(word, template)
@@ -328,7 +338,7 @@ def string_to_feature(value):
 with open(filename) as file:
     for line in file:
         linecount += 1
-        if (linecount > maxlines):
+        if (maxlines > 0 and linecount > maxlines):
             sys.exit(0)
         parse_line(line)
             
