@@ -8,7 +8,7 @@ import scanner
 filename = sys.argv[1]
 
 linecount = 0
-maxlines = 32000
+maxlines = -1 #32000
 
 output_lines = []
 
@@ -88,7 +88,9 @@ class MyEnumMeta(EnumMeta):
             return True
 
 class Feature(Enum, metaclass=MyEnumMeta):
-    pass
+
+    def __str__(self):
+        return self.value;
         
 class Casus(Feature):
     NOMINATIVE = "nom"
@@ -109,9 +111,9 @@ class Gender(Feature):
     NEUTER = "n"
 
 class Person(Feature):
-    FIRST = 1
-    SECOND = 2
-    THIRD = 3
+    FIRST = "1"
+    SECOND = "2"
+    THIRD = "3"
 
 class Tense(Feature):
     PRESENT = "pres"
@@ -160,6 +162,9 @@ class Noun(Grammar):
             case Number():
                 self.number = feature
 
+    def __str__(self):
+        return "-".join((str(self.gender), str(self.casus), str(self.number)))
+
 @dataclass
 class Adjective(Noun):
     pass
@@ -184,7 +189,10 @@ class Verb(Grammar):
                 self.voice = feature
             case Mood():
                 self.mood = feature
-    
+                
+    def __str__(self):
+        return "-".join((str(self.person), str(self.number), str(self.tense), str(self.voice), str(self.mood)))
+
     
 #default grammar value for each pos
 grammar_from_pos = {
@@ -206,6 +214,8 @@ def write_parsed(word):
         return
     if (word.pos is None):
         return
+    if (re.search('^[a-zA-Z]+$', word.page) is None):
+        return
     for infl in word.infl:
             output_lines.append (",".join((word.text, word.meter, word.pos, str(infl))))
             print (output_lines[-1])
@@ -219,7 +229,6 @@ def read_template(line):
     #split on |
     parts = text.split('|')
     #name is 0
-    print(parts[0])
     template = Template(parts[0])
     for i in (range(1, len(parts))):
         part = (parts[i])
@@ -296,6 +305,8 @@ def parse_template(word, line):
             word = template_head(word, template)
         case "infl of" | "inflection of":
             word = template_infl_of(word,template)
+        case _:
+            print (template.name + " not parsed")
     return word
 
 def parse_heading(word, line):
@@ -344,6 +355,6 @@ with open(filename) as file:
             
 
 #write output
-
+print (len(output_lines))
                     
                     

@@ -35,6 +35,7 @@ hvre = re.compile("[{0}]".format(vowels)) #has vowels
 evre = re.compile("[{0}]$".format(vowels)) #ends with vowel
 emre = re.compile("[{0}]m$".format(vowels)) #ends with m
 elre = re.compile("[{0}]$".format(long_consonants)) #ends with a long consonant
+eccre = re.compile("[{0}][{0}]$".format(consonants)) #ends with many consonants
 ignores = "hH"
 diphthongs = ["ae", "au", "ei", "eu", "oe", "Ae", "Au", "Ei", "Eu", "Oe",]
 short_clusters = ["qu", "Qu"]
@@ -106,6 +107,8 @@ def scan_text(text):
     elif (evre.search(current) is not None):
         end = "V"
     elif (elre.search(current) is not None):
+        end = "X"
+    elif (eccre.search(current) is not None):
         end = "X"
     else:
         end = "C"
