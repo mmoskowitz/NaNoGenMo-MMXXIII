@@ -3,11 +3,12 @@
 import sys,re, copy
 from dataclasses import dataclass, field
 from enum import Enum, EnumMeta
+import scanner
 
 filename = sys.argv[1]
 
 linecount = 0
-maxlines = -1 #3200
+maxlines = 32000
 
 output_lines = []
 
@@ -133,10 +134,10 @@ class Grammar:
 class Word:
     infl: list[Grammar] = field(default_factory=list)
     text: str = None
-    page: str = None
-    meter: str = ""
-    pos: str = None
-    head: str = None
+    page: str = None # ascii version of word
+    meter: str = "" # meter of word
+    pos: str = None # part of speech
+    head: str = None # actual headword
     
 @dataclass
 class Template:
@@ -197,6 +198,8 @@ grammar_from_pos = {
     
 word = Word() #the current word
 
+
+
 def write_parsed(word):
     global output_lines
     if (word.text is None):
@@ -216,7 +219,6 @@ def read_template(line):
     #split on |
     parts = text.split('|')
     #name is 0
-    print(line)
     print(parts[0])
     template = Template(parts[0])
     for i in (range(1, len(parts))):
@@ -240,12 +242,11 @@ def template_head(word, template):
         if (word.head is not None):
             write_parsed(word)
         word.text = template.params['head']
+        word.meter = scanner.scan_text(word.text)
         word.head = word.text
     return word
 
 def template_infl_of(word, template):
-    print(word.text)
-    print(template)
     #get set of grammars
     sets = []
     set = []
@@ -256,7 +257,6 @@ def template_infl_of(word, template):
         else:
             #deal with values
             values = arg.split("//")
-            print(values)
             features = []
             for value in values:
                 feature = string_to_feature(value)
@@ -266,7 +266,6 @@ def template_infl_of(word, template):
                 set.append(features)
     #store all sets and write each combination to a word
     sets.append(set)
-    print(sets)
     for set in sets:
         if (word.pos in grammar_from_pos):
             grammar = grammar_from_pos[word.pos]
@@ -313,6 +312,7 @@ def parse_line(line):
         write_parsed(word)
         text = line.removeprefix('=Lemma:=')
         word = Word(page=text, text=text)
+        word.meter = scanner.scan_text(text)
     if ("{{" in line):
         word = parse_template(word, line)
     if (line.startswith("===")):
