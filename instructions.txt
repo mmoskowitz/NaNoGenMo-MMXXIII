@@ -24,6 +24,7 @@ $ rm ../analysis/alltext.txt; for i in *.txt; do echo $i; cat $i | grep . >> ../
 $ cd ../analysis
 $ sed 's/{{/\n{{/g' alltext.txt > nltext.txt
 $ ../../source/python/clean-alltext.py nltext.txt > cleaned.txt
+$ ../../source/python/parse-alltext.py cleaned.txt  > parsed.csv
 
 
 

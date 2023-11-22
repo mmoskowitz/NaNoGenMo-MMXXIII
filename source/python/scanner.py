@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-import re
+import re, sys
+
+debug = False
 
 tests = [
     "a",
@@ -53,7 +55,8 @@ def scan_text(text):
     is_start = True
     for l in text:
         if not (l in letters):
-            print ("non-letter in word: " + l)
+            if (debug):
+                print ("non-letter in word: " + l, file=sys.stderr)
             continue
         if (l in ignores):
             continue

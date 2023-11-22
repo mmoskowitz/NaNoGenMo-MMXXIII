@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
 import sys,re, copy
-from dataclasses import dataclass, field
-from enum import Enum, EnumMeta
 import scanner
+import data
 
 filename = sys.argv[1]
 
 linecount = 0
 maxlines = -1 #32000
+debug = False
 
 output_lines = []
 
@@ -77,149 +77,33 @@ pos_from_head = {
     "verb": "v",
 }
 
-#from https://stackoverflow.com/questions/43634618/how-do-i-test-if-int-value-exists-in-python-enum-without-using-try-catch
-class MyEnumMeta(EnumMeta):  
-    def __contains__(cls, item):
-        try:
-            cls(item)
-        except ValueError:
-            return False
-        else:
-            return True
-
-class Feature(Enum, metaclass=MyEnumMeta):
-
-    def __str__(self):
-        return self.value;
-        
-class Casus(Feature):
-    NOMINATIVE = "nom"
-    GENITIVE = "gen"
-    DATIVE = "dat"
-    ACCUSATIVE = "acc"
-    ABLATIVE = "abl"
-    VOCATIVE = "voc"
-    LOCATIVE = "loc"
-
-class Number(Feature):
-    SINGULAR = "s"
-    PLURAL = "p"
-
-class Gender(Feature):
-    MASCULINE = "m"
-    FEMININE = "f"
-    NEUTER = "n"
-
-class Person(Feature):
-    FIRST = "1"
-    SECOND = "2"
-    THIRD = "3"
-
-class Tense(Feature):
-    PRESENT = "pres"
-
-class Voice(Feature):
-    ACTIVE = "actv"
-    PASSIVE = "pass"
-    
-class Mood(Feature):
-    INDICATIVE = "indc"
-    SUBJUNCTIVE = "subj"
-
-@dataclass
-class Grammar:
-    def set_feature(self, feature):
-        pass
-
-
-@dataclass
-class Word:
-    infl: list[Grammar] = field(default_factory=list)
-    text: str = None
-    page: str = None # ascii version of word
-    meter: str = "" # meter of word
-    pos: str = None # part of speech
-    head: str = None # actual headword
-    
-@dataclass
-class Template:
-    name: str = None
-    args: list[str] = field(default_factory=list)
-    params: dict = field(default_factory = lambda: {})
-
-@dataclass
-class Noun(Grammar):
-    gender: Gender = Gender.NEUTER
-    casus: Casus = Casus.NOMINATIVE
-    number: Number = Number.SINGULAR
-
-    def set_feature(self, feature):
-        match(feature):
-            case Gender():
-                self.gender = feature
-            case Casus():
-                self.casus = feature
-            case Number():
-                self.number = feature
-
-    def __str__(self):
-        return "-".join((str(self.gender), str(self.casus), str(self.number)))
-
-@dataclass
-class Adjective(Noun):
-    pass
-
-@dataclass
-class Verb(Grammar):
-    person: Person = Person.FIRST
-    number: Number = Number.SINGULAR
-    tense: Tense = Tense.PRESENT
-    voice: Voice = Voice.ACTIVE
-    mood: Mood = Mood.INDICATIVE
-
-    def set_feature(self, feature):
-        match(feature):
-            case Person():
-                self.person = feature
-            case Number():
-                self.number = feature
-            case Tense():
-                self.tense = feature
-            case Voice():
-                self.voice = feature
-            case Mood():
-                self.mood = feature
-                
-    def __str__(self):
-        return "-".join((str(self.person), str(self.number), str(self.tense), str(self.voice), str(self.mood)))
-
-    
-#default grammar value for each pos
-grammar_from_pos = {
-    "pn": Noun(),
-    "n": Noun(),
-    "v": Verb(),
-    "adj": Adjective(),
-    }
 
 
     
-word = Word() #the current word
+word = data.Word() #the current word
 
 
 
 def write_parsed(word):
     global output_lines
+
+    #skip some
     if (word.text is None):
         return
     if (word.pos is None):
         return
     if (re.search('^[a-zA-Z]+$', word.page) is None):
         return
-    for infl in word.infl:
-            output_lines.append (",".join((word.text, word.meter, word.pos, str(infl))))
-            print (output_lines[-1])
 
+    #what do we need for now?
+    for infl in word.infl:
+            output_lines.append (str_infl(word, infl))
+            if (debug):
+                print (output_lines[-1])
+
+def str_infl(word, infl):
+    return (",".join((word.text, word.meter, word.pos, str(infl))))
+            
 def read_template(line):
     #pull out text
     possible_text = re.match("{{(.*)}}", line)
@@ -229,7 +113,7 @@ def read_template(line):
     #split on |
     parts = text.split('|')
     #name is 0
-    template = Template(parts[0])
+    template = data.Template(parts[0])
     for i in (range(1, len(parts))):
         part = (parts[i])
         if ('=' in part):
@@ -268,7 +152,7 @@ def template_infl_of(word, template):
             values = arg.split("//")
             features = []
             for value in values:
-                feature = string_to_feature(value)
+                feature = data.string_to_feature(value)
                 if (feature is not None):
                     features.append(feature)
             if (len(features) > 0):
@@ -276,8 +160,8 @@ def template_infl_of(word, template):
     #store all sets and write each combination to a word
     sets.append(set)
     for set in sets:
-        if (word.pos in grammar_from_pos):
-            grammar = grammar_from_pos[word.pos]
+        if (word.pos in data.grammar_from_pos):
+            grammar = data.grammar_from_pos[word.pos]
             set_to_infls(word, set, grammar)
     return word
 
@@ -306,7 +190,8 @@ def parse_template(word, line):
         case "infl of" | "inflection of":
             word = template_infl_of(word,template)
         case _:
-            print (template.name + " not parsed")
+            if (debug):
+                print (template.name + " not parsed")
     return word
 
 def parse_heading(word, line):
@@ -322,28 +207,13 @@ def parse_line(line):
         #print(word)
         write_parsed(word)
         text = line.removeprefix('=Lemma:=')
-        word = Word(page=text, text=text)
+        word = data.Word(page=text, text=text)
         word.meter = scanner.scan_text(text)
     if ("{{" in line):
         word = parse_template(word, line)
     if (line.startswith("===")):
         word = parse_heading(word, line)
 
-def string_to_feature(value):
-    if (value in Casus):
-        return Casus(value)
-    if value in Number:
-        return Number(value)
-    if value in Gender:
-        return Gender(value)
-    if value in Person:
-        return Person(value)
-    if value in Tense:
-        return Tense(value)
-    if value in Voice:
-        return Voice(value)
-    return None
-    
 
 #read content
 with open(filename) as file:
@@ -355,6 +225,5 @@ with open(filename) as file:
             
 
 #write output
-print (len(output_lines))
-                    
-                    
+for line in output_lines:
+    print (line)
