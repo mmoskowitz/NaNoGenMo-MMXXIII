@@ -2,6 +2,9 @@
 
 from dataclasses import dataclass, field
 from enum import Enum, EnumMeta
+import copy
+
+
 
 #from https://stackoverflow.com/questions/43634618/how-do-i-test-if-int-value-exists-in-python-enum-without-using-try-catch
 class MyEnumMeta(EnumMeta):  
@@ -57,6 +60,10 @@ class Grammar:
     def set_feature(self, feature):
         pass
 
+    def __hash__(self): return hash(str(self))
+    def __eq__(self, x): return str(self)==str(x)
+    def __ne__(self, x): return str(self)!=str(x)
+
 
 @dataclass
 class Word:
@@ -66,6 +73,17 @@ class Word:
     infl: list[Grammar] = field(default_factory=list)
     text: str = None
     page: str = None # ascii version of word
+
+    @classmethod
+    def parse_line(cls, line):
+        parts = line.split(',')
+        (head, meter, pos, inflcode) = parts[0:4]
+        infl = copy.deepcopy(pos_to_grammar(pos))
+        for feature in inflcode.split('-'):
+            infl.set_feature(string_to_feature(feature))
+        word = Word(head, pos, meter, [infl])
+        return word
+        
     
 @dataclass
 class Template:
@@ -91,9 +109,16 @@ class Noun(Grammar):
     def __str__(self):
         return "-".join((str(self.gender), str(self.casus), str(self.number)))
 
+    def __hash__(self): return hash("n:" + str(self))
+    def __eq__(self, x): return isinstance(x, Noun) and str(self)==str(x)
+    def __ne__(self, x): return not(isinstance(x, Noun)) or str(self)!=str(x)
+    
 @dataclass
 class Adjective(Noun):
-    pass
+
+    def __hash__(self): return hash("adj:" + str(self))
+    def __eq__(self, x): return isinstance(x, Adjective) and str(self)==str(x)
+    def __ne__(self, x): return not(isinstance(x, Adjective)) or str(self)!=str(x)
 
 @dataclass
 class Verb(Grammar):
@@ -119,6 +144,10 @@ class Verb(Grammar):
     def __str__(self):
         return "-".join((str(self.person), str(self.number), str(self.tense), str(self.voice), str(self.mood)))
 
+    def __hash__(self): return hash("v:" + str(self))
+    def __eq__(self, x): return isinstance(x, Verb) and str(self)==str(x)
+    def __ne__(self, x): return not(isinstance(x, Verb)) or str(self)!=str(x)
+
     
 #default grammar value for each pos
 grammar_from_pos = {
@@ -127,6 +156,12 @@ grammar_from_pos = {
     "v": Verb(),
     "adj": Adjective(),
     }
+
+def pos_to_grammar(pos):
+    if (pos not in grammar_from_pos):
+        return Grammar()
+    else:
+        return grammar_from_pos[pos]
 
 def string_to_feature(value):
     if (value in Casus):

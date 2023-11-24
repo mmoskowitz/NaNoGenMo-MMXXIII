@@ -3,29 +3,33 @@
 import sys,re, copy
 import scanner
 import data
+import verse
+import lexicon
+
 
 filename = sys.argv[1]
 
-meters = {}
-
-def parse_line(line):
-    global meters
-    parts = line.split(',')
-    (head, meter, pos) = parts[0:3]
-    word = data.Word(head, pos, meter)
-    if (meter not in meters):
-        meters[meter] = []
-    meters[meter].append(head)
-    #print (word, meter, len(meters[meter]))
-
+lexicon = lexicon.Lexicon()
 
 #read content
 with open(filename) as file:
+    i = 0
     for line in file:
-        parse_line(line)
+        i+= 1
+        lexicon.parse_line(line)
+        if (i % 100000 == 0):
+            print (i)
 
+#print (len(lexicon.infls))
+#print ("/n".join([(str(infl) + str(type(infl))) for infl in lexicon.infls]))
+            
+verse = verse.Verse()
+        
+for i in range(6):
+    word = lexicon.get_word("CLSSV")
+    print (word)
+    verse.add_word(word)
 
-for meter in meters:
-    print (len(meters[meter]), meter)
-
+print(str(verse))
+        
 
