@@ -60,6 +60,11 @@ class Grammar:
     def set_feature(self, feature):
         pass
 
+    """
+    returns true if the defined features in x match self
+    """
+    def matches(self, x): return False
+
     def __hash__(self): return hash(str(self))
     def __eq__(self, x): return str(self)==str(x)
     def __ne__(self, x): return str(self)!=str(x)
@@ -78,10 +83,16 @@ class Word:
     def parse_line(cls, line):
         parts = line.split(',')
         (head, meter, pos, inflcode) = parts[0:4]
+        debug = False # (head == "culmina")
         infl = copy.deepcopy(pos_to_grammar(pos))
-        for feature in inflcode.split('-'):
-            infl.set_feature(string_to_feature(feature))
+        for featurecode in inflcode.strip().split('-'):
+            feature = string_to_feature(featurecode)
+            if (debug):
+                print (featurecode, feature)
+            infl.set_feature(feature)
         word = Word(head, pos, meter, [infl])
+        if (debug):
+            print (word, line)
         return word
         
     
@@ -109,6 +120,17 @@ class Noun(Grammar):
     def __str__(self):
         return "-".join((str(self.gender), str(self.casus), str(self.number)))
 
+    def matches(self, x):
+        if not(isinstance(x, Noun)):
+            return False
+        if (x.gender is not None and x.gender != self.gender):
+            return False
+        if (x.casus is not None and x.casus != self.casus):
+            return False
+        if (x.number is not None and x.number != self.number):
+            return False
+        return True
+        
     def __hash__(self): return hash("n:" + str(self))
     def __eq__(self, x): return isinstance(x, Noun) and str(self)==str(x)
     def __ne__(self, x): return not(isinstance(x, Noun)) or str(self)!=str(x)
@@ -116,6 +138,17 @@ class Noun(Grammar):
 @dataclass
 class Adjective(Noun):
 
+    def matches(self, x):
+        if not(isinstance(x, Adjective)):
+            return False
+        if (x.gender is not None and x.gender != self.gender):
+            return False
+        if (x.casus is not None and x.casus != self.casus):
+            return False
+        if (x.number is not None and x.number != self.number):
+            return False
+        return True
+        
     def __hash__(self): return hash("adj:" + str(self))
     def __eq__(self, x): return isinstance(x, Adjective) and str(self)==str(x)
     def __ne__(self, x): return not(isinstance(x, Adjective)) or str(self)!=str(x)
@@ -144,6 +177,21 @@ class Verb(Grammar):
     def __str__(self):
         return "-".join((str(self.person), str(self.number), str(self.tense), str(self.voice), str(self.mood)))
 
+    def matches(self, x):
+        if not(isinstance(x, Verb)):
+            return False
+        if (x.person is not None and x.person != self.person):
+            return False
+        if (x.number is not None and x.number != self.number):
+            return False
+        if (x.tense is not None and x.tense != self.tense):
+            return False
+        if (x.voice is not None and x.voice != self.voice):
+            return False
+        if (x.mood is not None and x.mood != self.mood):
+            return False
+        return True
+        
     def __hash__(self): return hash("v:" + str(self))
     def __eq__(self, x): return isinstance(x, Verb) and str(self)==str(x)
     def __ne__(self, x): return not(isinstance(x, Verb)) or str(self)!=str(x)
@@ -154,6 +202,7 @@ grammar_from_pos = {
     "pn": Noun(),
     "n": Noun(),
     "v": Verb(),
+    "part": Adjective(),
     "adj": Adjective(),
     }
 

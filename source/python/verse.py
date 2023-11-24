@@ -61,11 +61,11 @@ class Verse:
     words: list[str] = field(default_factory=list)
 
     def add_word(self, word):
+        #TODO: check the new meter vs. the goal
         if (len(self.current) == 0):
             self.current = self.current + word.meter[1:]
         else:
             junction = self.current[-2:] + word.meter[:2]
-            print (junction)
             self.current = self.current[:-2] + combinations[junction] + word.meter [2:]
             
         self.words.append(word.head)

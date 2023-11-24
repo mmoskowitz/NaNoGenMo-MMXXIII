@@ -33,10 +33,14 @@ class Lexicon():
             meter_infls[infl] = []
         meter_infls[infl].append(word)
 
-    def get_word(self, meter):
-        meter_infls = self.meters[meter]
+    def get_word(self, meters, infls=()):
         words = []
-        for infl in meter_infls:
-            words.extend(meter_infls[infl])
+        for meter in meters:
+            if (meter in self.meters):
+                meter_infls = self.meters[meter]
+                for infl in meter_infls:
+                    for requested_infl in infls:
+                        if (infl.matches(requested_infl)):
+                            words.extend(meter_infls[infl])
         return random.choice(words)
         
