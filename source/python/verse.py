@@ -69,7 +69,6 @@ class Verse:
 
     def add_word(self, word):
         self.current = self.get_new_current(word.meter)
-            
         self.words.append(word.head)
 
 
@@ -82,26 +81,50 @@ class Verse:
             return (self.current + meter[1:])
         else:
             junction = self.current[-2:] + meter[:2]
+            #print (junction, combinations[junction])
             return (self.current[:-2] + combinations[junction] + meter [2:])
 
     """
-    returns true is the new_current value is okay for the goal
+    returns true is the meter value is okay for the goal
     """
-    def check_meter(self, meter):
+    def check_meter(self, meter, check_complete=False):
         index = 0
-        for f in range(len(self.goal)):
-            foot = self.goal[f]
+        for foot in self.goal:
             #does this foot fit?
             foot_ok = False
             for o in foot.options:
                 #print (meter[index:])
-                if (meter[index:].startswith(o) or o.startswith(meter[index:-2])):
-                    #print ("Yes", meter, index, o)
+                if (
+                    meter[index:].startswith(o) or
+                    (o.endswith("L") and o.startswith(meter[index:-2])) or
+                    (o.endswith("S") and o.startswith(meter[index:-1]))
+                ):
                     foot_ok = True
                     index += len(o)
+                    #print ("Yes", meter, index, o)
                     break
             if (not(foot_ok)):
                 return False
-        return True
+            elif (index == len(meter) - 1): #complete
+                if (check_complete and foot != self.goal[-1]):
+                    return False
+                return True
 
-                
+        if (index < len(meter) - 1): #verse too long
+            return False
+        if (check_complete): #check for full verse or not
+            return False
+        else:
+            return True
+
+    def get_next_meters(self, lexicon):
+        current = self.current
+        meters = []
+        if (self.check_meter(current, True)):
+            return []
+        #dumb brute force as initial implementation
+        for meter in lexicon.meters:
+            possible_current = self.get_new_current(meter)
+            if (self.check_meter(possible_current)):
+                meters.append(meter)
+        return meters

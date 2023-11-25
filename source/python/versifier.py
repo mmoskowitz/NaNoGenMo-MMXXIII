@@ -31,27 +31,26 @@ temp_verse = verse.Verse()
 for i in range(4):
     temp_verse.goal.append(verse.Foot(["LSS","LL"]))
 temp_verse.goal.append(verse.Foot(["LSS"]))
-temp_verse.goal.append(verse.Foot(["LL"]))
+temp_verse.goal.append(verse.Foot(["LL", "LS"]))
                       
 
-infl = data.Noun()
+infl = data.Adjective()
 infl.casus = None
 infl.gender = None
 infl.number = None #data.Number.SINGULAR
-meters = [
-    "VLSV",
-    "CSLSV",
-    "CSLV",
-    "CLLV",
-    "CLLSC",
-    "VSLLC",
-    ]
-for meter in meters:
-    word = lexicon.get_word([meter], [infl])
+
+possible_meters = temp_verse.get_next_meters(lexicon)
+print(len(possible_meters))
+while (len(possible_meters) > 0):
+    word = lexicon.get_word(possible_meters, [infl])
     #print (word)
     temp_verse.add_word(word)
-    print (temp_verse.check_meter(temp_verse.current))
+    possible_meters = temp_verse.get_next_meters(lexicon)
+    #print((possible_meters))
+    print(str(temp_verse))
 
-print(str(temp_verse))
+print ("line complete")
+
+
         
 

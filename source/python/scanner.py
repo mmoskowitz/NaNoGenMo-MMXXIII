@@ -17,6 +17,7 @@ tests = [
     'zam',
     'aequeo',
     'Abalōrum',
+    'coquum',
     ]
 
 LONG_CODE = "@"
@@ -90,6 +91,7 @@ def scan_text(text):
                 continue
             if (is_vowel):
                 if (current.endswith("q") and l == "u"): #skip u after q
+                    current = current[:-1] + "c" #but only once
                     continue 
                 if ((current + l) in diphthongs): #diphthong
                     current += LONG_CODE
