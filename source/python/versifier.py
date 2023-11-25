@@ -11,6 +11,8 @@ filename = sys.argv[1]
 
 lexicon = lexicon.Lexicon()
 
+debug = True
+
 #read content
 with open(filename) as file:
     i = 0
@@ -19,21 +21,37 @@ with open(filename) as file:
         lexicon.parse_line(line)
         if (i % 50000 == 0):
             print (i)
+            if (debug and i > 200000):
+                break
 
 #print (len(lexicon.infls))
 #print ("/n".join([(str(infl) + str(type(infl))) for infl in lexicon.infls]))
             
-verse = verse.Verse()
+temp_verse = verse.Verse()
+for i in range(4):
+    temp_verse.goal.append(verse.Foot(["LSS","LL"]))
+temp_verse.goal.append(verse.Foot(["LSS"]))
+temp_verse.goal.append(verse.Foot(["LL"]))
+                      
 
 infl = data.Noun()
 infl.casus = None
 infl.gender = None
-infl.number = data.Number.SINGULAR
-for i in range(6):
-    word = lexicon.get_word(["CLSSV"], [infl])
-    print (word)
-    verse.add_word(word)
+infl.number = None #data.Number.SINGULAR
+meters = [
+    "VLSV",
+    "CSLSV",
+    "CSLV",
+    "CLLV",
+    "CLLSC",
+    "VSLLC",
+    ]
+for meter in meters:
+    word = lexicon.get_word([meter], [infl])
+    #print (word)
+    temp_verse.add_word(word)
+    print (temp_verse.check_meter(temp_verse.current))
 
-print(str(verse))
+print(str(temp_verse))
         
 
