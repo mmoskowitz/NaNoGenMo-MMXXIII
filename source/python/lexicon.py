@@ -42,5 +42,8 @@ class Lexicon():
                     for requested_infl in infls:
                         if (infl.matches(requested_infl)):
                             words.extend(meter_infls[infl])
-        return random.choice(words)
+        if (len(words) > 0):
+            return random.choice(words)
+        else:
+            return None
         
