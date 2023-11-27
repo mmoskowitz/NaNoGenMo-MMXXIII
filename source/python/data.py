@@ -46,6 +46,8 @@ class Person(Feature):
 
 class Tense(Feature):
     PRESENT = "pres"
+    PERFECT = "perf"
+    IMPERFECT = "impf"
 
 class Voice(Feature):
     ACTIVE = "actv"
@@ -54,6 +56,7 @@ class Voice(Feature):
 class Mood(Feature):
     INDICATIVE = "indc"
     SUBJUNCTIVE = "subj"
+    IMPERATIVE = "impr"
 
 @dataclass
 class Grammar:
@@ -76,7 +79,7 @@ class Word:
     pos: str = None # part of speech
     meter: str = "" # meter of word
     infl: list[Grammar] = field(default_factory=list)
-    text: str = None
+    text: str = None # is this used?
     page: str = None # ascii version of word
 
     @classmethod
@@ -136,7 +139,22 @@ class Noun(Grammar):
     def __ne__(self, x): return not(isinstance(x, Noun)) or str(self)!=str(x)
     
 @dataclass
-class Adjective(Noun):
+class Adjective(Grammar):
+    gender: Gender = Gender.NEUTER
+    casus: Casus = Casus.NOMINATIVE
+    number: Number = Number.SINGULAR
+
+    def set_feature(self, feature):
+        match(feature):
+            case Gender():
+                self.gender = feature
+            case Casus():
+                self.casus = feature
+            case Number():
+                self.number = feature
+
+    def __str__(self):
+        return "-".join((str(self.gender), str(self.casus), str(self.number)))
 
     def matches(self, x):
         if not(isinstance(x, Adjective)):
@@ -225,5 +243,7 @@ def string_to_feature(value):
         return Tense(value)
     if value in Voice:
         return Voice(value)
+    if value in Mood:
+        return Mood(value)
     return None
     

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-import random
+import random, copy
 import data
+
 
 random.seed(2023)
 
@@ -34,6 +35,13 @@ class Lexicon():
         meter_infls[infl].append(word)
 
     def get_word(self, meters, infls=()):
+        words = self.get_words(meters, infls)
+        if (words is not None):
+            return copy.deepcopy(random.choice(words))
+        else:
+            return None
+
+    def get_words(self, meters, infls=()):
         words = []
         for meter in meters:
             if (meter in self.meters):
@@ -43,7 +51,8 @@ class Lexicon():
                         if (infl.matches(requested_infl)):
                             words.extend(meter_infls[infl])
         if (len(words) > 0):
-            return random.choice(words)
+            #print (len(meters), infls, len(words))
+            return (words)
         else:
             return None
         

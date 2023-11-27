@@ -82,7 +82,21 @@ pos_from_head = {
     
 word = data.Word() #the current word
 
+last_priority = 0
+#priorities:
+#0|=Lemma
+#1|==Latin==
+#2|===Pos===
+#3|{{head
+#4|{{infl
 
+def conditional_write_parsed(priority):
+    global last_priority
+    global word
+    if (priority < last_priority):
+        write_parsed(word)
+    last_priority = priority
+    
 
 def write_parsed(word):
     global output_lines
@@ -130,16 +144,20 @@ def template_head(word, template):
         pos = template.args[1]
         if (pos not in pos_from_head):
             return word
+        conditional_write_parsed(3)
         word.pos = pos_from_head[pos]
     if ('head' in template.params):
         if (word.head is not None):
-            write_parsed(word)
-        word.text = template.params['head']
+            word.text = template.params['head']
+        else:
+            word.text = word.page
         word.meter = scanner.scan_text(word.text)
         word.head = word.text
     return word
 
 def template_infl_of(word, template):
+    conditional_write_parsed(4)
+    word.infl = []
     #get set of grammars
     sets = []
     set = []
@@ -197,15 +215,19 @@ def parse_template(word, line):
 def parse_heading(word, line):
     heading = line.replace('=', '')
     if (heading in pos_headings):
+        conditional_write_parsed(2)
+        word.text = word.page
+        word.head = word.page
         word.pos = pos_headings[heading]
+        word.infl = []
     return word
-    
+
 def parse_line(line):
     line = line.strip()
     global word
     if (line.startswith('=Lemma:=')):
         #print(word)
-        write_parsed(word)
+        conditional_write_parsed(0)
         text = line.removeprefix('=Lemma:=')
         word = data.Word(page=text, text=text)
         word.meter = scanner.scan_text(text)
@@ -220,8 +242,12 @@ with open(filename) as file:
     for line in file:
         linecount += 1
         if (maxlines > 0 and linecount > maxlines):
+            for line in output_lines:
+                print (line)
             sys.exit(0)
         parse_line(line)
+
+    conditional_write_parsed(0)
             
 
 #write output

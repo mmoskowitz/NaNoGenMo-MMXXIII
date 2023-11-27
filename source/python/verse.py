@@ -84,7 +84,7 @@ class Verse:
 
 
     def __str__(self):
-        return (self.current[:-1] + ": " + " ".join(self.words))
+        return (" ".join(self.words))
 
     def get_new_current(self, new_meter):
         #TODO: check the new meter vs. the goal        
@@ -180,10 +180,9 @@ class Verse:
                 return index
         return index
             
-        
+    
         
     def get_next_meters(self, lexicon):
-        #TODO: end of line and caesura/diaeresis
         temp_meters = []
         if (self.check_meter("", True)):
             return []
