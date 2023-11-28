@@ -107,7 +107,7 @@ class Template:
 
 @dataclass
 class Noun(Grammar):
-    gender: Gender = Gender.NEUTER
+    gender: Gender = Gender.MASCULINE
     casus: Casus = Casus.NOMINATIVE
     number: Number = Number.SINGULAR
 
@@ -140,7 +140,7 @@ class Noun(Grammar):
     
 @dataclass
 class Adjective(Grammar):
-    gender: Gender = Gender.NEUTER
+    gender: Gender = Gender.MASCULINE
     casus: Casus = Casus.NOMINATIVE
     number: Number = Number.SINGULAR
 
@@ -171,6 +171,22 @@ class Adjective(Grammar):
     def __eq__(self, x): return isinstance(x, Adjective) and str(self)==str(x)
     def __ne__(self, x): return not(isinstance(x, Adjective)) or str(self)!=str(x)
 
+@dataclass
+class Adverb(Grammar):
+
+    def __str__(self):
+        return "adv"
+    
+    def matches(self, x):
+        if not(isinstance(x, Adverb)):
+            return False
+        return True
+        
+    def __hash__(self): return hash("adv:" + str(self))
+    def __eq__(self, x): return isinstance(x, Verb) and str(self)==str(x)
+    def __ne__(self, x): return not(isinstance(x, Verb)) or str(self)!=str(x)
+
+    
 @dataclass
 class Verb(Grammar):
     person: Person = Person.FIRST
@@ -222,6 +238,7 @@ grammar_from_pos = {
     "v": Verb(),
     "part": Adjective(),
     "adj": Adjective(),
+    "adv": Adverb(),
     }
 
 def pos_to_grammar(pos):

@@ -38,8 +38,9 @@ with open(filename) as file:
                 if (line.find("==Latin==") >= 0):
                     is_latin=True
                     output_lines.append("==Latin==")
-                    
-with open(title.replace(' ', '_') + ".txt", "w") as output:
+
+filename_id = filename.split('/')[-1][:-4]
+with open(title.replace(' ', '_') + filename_id + ".txt", "w") as output:
     output.write("=Lemma:=" + title + "\n")
     for line in output_lines:
         output.write(line)

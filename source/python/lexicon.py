@@ -20,6 +20,8 @@ class Lexicon():
 
     def parse_line(self, line):
         word = data.Word.parse_line(line)
+        if (len(word.head) <= 3 and word.pos not in ("conj", "intj")):
+            return
         self.add_word(word)
     
     def add_word(self, word):

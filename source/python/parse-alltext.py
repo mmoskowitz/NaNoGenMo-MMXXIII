@@ -87,13 +87,16 @@ last_priority = 0
 #0|=Lemma
 #1|==Latin==
 #2|===Pos===
-#3|{{head
-#4|{{infl
+#3|{{head,
+#4|{{la-IPA
+#5|{{la-*
+#6|{{infl
 
-def conditional_write_parsed(priority):
+def conditional_write_parsed(priority, word):
     global last_priority
-    global word
-    if (priority < last_priority):
+    #print (priority, last_priority)
+    if (priority <= last_priority):
+        #print ("write", word)
         write_parsed(word)
     last_priority = priority
     
@@ -106,7 +109,11 @@ def write_parsed(word):
         return
     if (word.pos is None):
         return
+    if (len(word.meter) < 3):
+        return
     if (re.search('^[a-zA-Z]+$', word.page) is None):
+        return
+    if (word.meter in ("VLV", "VSV", "VLM", "VSM")):
         return
 
     #what do we need for now?
@@ -144,19 +151,58 @@ def template_head(word, template):
         pos = template.args[1]
         if (pos not in pos_from_head):
             return word
-        conditional_write_parsed(3)
+        conditional_write_parsed(3, word)
         word.pos = pos_from_head[pos]
     if ('head' in template.params):
-        if (word.head is not None):
-            word.text = template.params['head']
-        else:
-            word.text = word.page
+        word.text = template.params['head']
+    else:
+        word.text = word.page
+    word.meter = scanner.scan_text(word.text)
+    word.head = word.text
+    return word
+
+def template_la_IPA(word, template):
+    if (len(template.args) > 0):
+        conditional_write_parsed(4, word)
+        head =  template.args[0]
+        word.text = head
         word.meter = scanner.scan_text(word.text)
         word.head = word.text
     return word
 
+def template_la_pos(word, template, pos=None):
+    if (pos is None):
+        pos = template.name[3:]
+    if (pos not in data.grammar_from_pos):
+        return word
+    conditional_write_parsed(5, word)
+    word.pos = pos
+    word.infl = [copy.deepcopy(data.pos_to_grammar(word.pos))]
+    if (len(template.args) > 0):
+        head =  template.args[0]
+        head_regex = "[^{0}]*([{0}]+)".format(scanner.letters) #move to const
+        #print (head_regex)
+        head_match = re.match(head_regex, head)
+        if (head_match is None): #should not happen
+            #print ("no match? no match!")
+            return word
+        head = head_match.group(1)
+        if (head == "irreg"):
+            return word
+        word.text = head
+        word.meter = scanner.scan_text(word.text)
+        word.head = word.text
+        if ("g" in template.params):
+            word.infl[0].set_feature(template.params["g"])
+    return word
+         
+        
+
 def template_infl_of(word, template):
-    conditional_write_parsed(4)
+    if (template.args[1] == "sum"): #forms of sum are too tricky
+        word.page = "0"
+        return word
+    conditional_write_parsed(6, word)
     word.infl = []
     #get set of grammars
     sets = []
@@ -207,6 +253,22 @@ def parse_template(word, line):
             word = template_head(word, template)
         case "infl of" | "inflection of":
             word = template_infl_of(word,template)
+        case "la-IPA":
+            word = template_la_IPA(word, template)
+        case "la-adj" | "la-adj-comp" | "la-adj-sup" | "la-det" | "la-num-adj" | "la-part":
+            word = template_la_pos(word, template, "adj")
+        case "la-adv" | "la-adv-comp" | "la-adv-sup" | "la-num-adv":
+            word = template_la_pos(word, template, "adv")
+        case "la-conj":
+            word = template_la_pos(word, template, "conj")
+        case "la-interj":
+            word = template_la_pos(word, template, "intj")
+        case "la-decl-gerund" | "la-gerund" | "la-noun" | "la-num-noun" | "la-praenomen" | "la-prop" | "la-proper noun" | "la-proper_noun":
+            word = template_la_pos(word, template, "n")
+        case "la-verb" :
+            word = template_la_pos(word, template, "v")
+        case "la-letter" | "la-phrase" | "la-prep" | "la-pronoun" :
+            word = template_la_pos(word, template)
         case _:
             if (debug):
                 print (template.name + " not parsed")
@@ -215,11 +277,11 @@ def parse_template(word, line):
 def parse_heading(word, line):
     heading = line.replace('=', '')
     if (heading in pos_headings):
-        conditional_write_parsed(2)
-        word.text = word.page
-        word.head = word.page
+        conditional_write_parsed(2, word)
+        #word.text = word.page
+        #word.head = word.page
         word.pos = pos_headings[heading]
-        word.infl = []
+        word.infl = [copy.deepcopy(data.pos_to_grammar(word.pos))]
     return word
 
 def parse_line(line):
@@ -227,7 +289,7 @@ def parse_line(line):
     global word
     if (line.startswith('=Lemma:=')):
         #print(word)
-        conditional_write_parsed(0)
+        conditional_write_parsed(0, word)
         text = line.removeprefix('=Lemma:=')
         word = data.Word(page=text, text=text)
         word.meter = scanner.scan_text(text)
@@ -247,7 +309,7 @@ with open(filename) as file:
             sys.exit(0)
         parse_line(line)
 
-    conditional_write_parsed(0)
+    conditional_write_parsed(0, word)
             
 
 #write output

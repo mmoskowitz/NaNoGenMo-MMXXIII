@@ -4,17 +4,41 @@ from dataclasses import dataclass, field
 
 import data
 import lexicon
+import random
 
-@dataclass
-class Sentence():
-    lexicon: lexicon.Lexicon
-    sequence: list[str] = (
+sequences = {
+    'base': (
         "subj",
         "subj-a",
         "obj",
         "obj-a",
+        "adv",
         "verb",
-        )
+    ),
+    'golden': (
+        "subj",
+        "obj",
+        "verb",
+        "subj-a",
+        "obj-a",
+    ),
+    'simple': (
+        "subj",
+        "obj",
+        "verb"
+        ),
+    'simple_adv': (
+        "subj",
+        "obj",
+        "adv",
+        "verb"
+        ),
+}
+
+@dataclass
+class Sentence():
+    lexicon: lexicon.Lexicon
+    sequence: list[str] = sequences['golden']
     infls: dict = field(default_factory=dict)
     backup_infls: dict = field(default_factory=dict)
 
@@ -49,7 +73,10 @@ class Sentence():
                 infl.person = None
                 infl.voice = data.Voice.ACTIVE
                 infl.tense = None
-                infl.mood = None
+                infl.mood = data.Mood.INDICATIVE
+                return infl
+            case("adv"):
+                infl = data.Adverb()
                 return infl
 
 

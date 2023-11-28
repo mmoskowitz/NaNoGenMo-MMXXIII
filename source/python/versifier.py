@@ -59,9 +59,6 @@ def build_line(temp_verse, lexicon):
         word = lexicon.get_word(possible_meters, [infl])
         if (word is None):
             return None
-        if (len(word.head) < 4):
-            possible_meters.remove(word.meter)
-            continue
         new_verse = copy.deepcopy(temp_verse)
         #print ("Placing ", word)
         temp_sentence.place_word(word)
