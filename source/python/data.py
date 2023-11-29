@@ -55,7 +55,7 @@ class Voice(Feature):
     
 class Mood(Feature):
     INDICATIVE = "indc"
-    SUBJUNCTIVE = "subj"
+    SUBJUNCTIVE = "sub"
     IMPERATIVE = "impr"
 
 @dataclass
@@ -188,8 +188,23 @@ class Adverb(Grammar):
         return True
         
     def __hash__(self): return hash("adv:" + str(self))
-    def __eq__(self, x): return isinstance(x, Verb) and str(self)==str(x)
-    def __ne__(self, x): return not(isinstance(x, Verb)) or str(self)!=str(x)
+    def __eq__(self, x): return isinstance(x, Adverb) and str(self)==str(x)
+    def __ne__(self, x): return not(isinstance(x, Adverb)) or str(self)!=str(x)
+
+@dataclass
+class Interjection(Grammar):
+
+    def __str__(self):
+        return "adv"
+    
+    def matches(self, x):
+        if not(isinstance(x, Interjection)):
+            return False
+        return True
+        
+    def __hash__(self): return hash("intj:" + str(self))
+    def __eq__(self, x): return isinstance(x, Interjection) and str(self)==str(x)
+    def __ne__(self, x): return not(isinstance(x, Interjection)) or str(self)!=str(x)
 
     
 @dataclass
@@ -246,6 +261,7 @@ grammar_from_pos = {
     "part": Adjective(),
     "adj": Adjective(),
     "adv": Adverb(),
+    "intj": Interjection(),
     }
 
 def pos_to_grammar(pos):
