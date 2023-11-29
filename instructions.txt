@@ -18,23 +18,14 @@ $ cd ..
 $ rm -rf pages
 $ mkdir lemmata
 $ cd lemmata
-$ for i in ../latin-pages/*; do echo $i; for j in $i/*.xml; do ../../source/python/latin-from-pages.py $j; done; done #this takes a few hours
+$ for i in ../latin-pages/*; do echo $i; for j in $i/*.xml; do ../../source/python/latin-from-pages.py $j; done; done #this takes a portion of a day
+$ mkdir ../lemmata-prima
+$ for i in `grep -srl 'la-[a-z]' .`; do mv $i ../lemmata-prima/$i; done
 $ mkdir ../analysis
-$ rm ../analysis/alltext.txt; for i in *.txt; do echo $i; cat $i | grep . >> ../analysis/alltext.txt; done #this takes maybe 20 minutes or so
+$ rm ../analysis/alltext.txt; for i in ../lemmata-prima/*.txt ../lemmata/*.txt; do echo $i; cat $i | grep . >> ../analysis/alltext.txt; done #this takes maybe 20 minutes or so
 $ cd ../analysis
 $ sed 's/{{/\n{{/g' alltext.txt > nltext.txt
 $ ../../source/python/clean-alltext.py nltext.txt > cleaned.txt
 $ ../../source/python/parse-alltext.py cleaned.txt  > parsed.csv
-
-
-
-
---ALT--
-$ mkdir splits
-$ cd splits
-$ csplit -k -n 8 ../enwiktionary-20231020-pages-articles.xml '/.*==Latin==.*/' '{824383}' #Hi Zalgo!
-$ for i in 0 1 2 3 4 5 6 7 8 9; do for j in 0 1 2 3 4 5 6 7 8 9; do mkdir ${i}${j}; mv xx*${i}${j} ${i}${j}/; done; done
-$ mkdir ../shaved
-$ for i in *; do mkdir ../shaved/$i; for j in $i/*; do gsed '0,/.*>/{s/.*>//}' $j | gsed  '0,/</{s/<.*//}' | gsed '/</,$d' > ../shaved/$j.xml; done; done
-$ cd ../shaved
+$ ../../source/python/versifier.py parsed.csv 10000 
 

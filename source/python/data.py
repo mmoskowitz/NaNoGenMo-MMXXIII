@@ -63,6 +63,7 @@ class Grammar:
     def set_feature(self, feature):
         pass
 
+    
     """
     returns true if the defined features in x match self
     """
@@ -112,6 +113,8 @@ class Noun(Grammar):
     number: Number = Number.SINGULAR
 
     def set_feature(self, feature):
+        if (not(isinstance(feature, Grammar))):
+            feature = string_to_feature(feature)
         match(feature):
             case Gender():
                 self.gender = feature
@@ -145,6 +148,8 @@ class Adjective(Grammar):
     number: Number = Number.SINGULAR
 
     def set_feature(self, feature):
+        if (not(isinstance(feature, Grammar))):
+            feature = string_to_feature(feature)
         match(feature):
             case Gender():
                 self.gender = feature
@@ -196,6 +201,8 @@ class Verb(Grammar):
     mood: Mood = Mood.INDICATIVE
 
     def set_feature(self, feature):
+        if (not(isinstance(feature, Grammar))):
+            feature = string_to_feature(feature)
         match(feature):
             case Person():
                 self.person = feature

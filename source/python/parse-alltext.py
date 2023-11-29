@@ -77,7 +77,7 @@ pos_from_head = {
     "verb": "v",
 }
 
-
+base_noun_store = {}
 
     
 word = data.Word() #the current word
@@ -180,13 +180,18 @@ def template_la_pos(word, template, pos=None):
     word.infl = [copy.deepcopy(data.pos_to_grammar(word.pos))]
     if (len(template.args) > 0):
         head =  template.args[0]
-        head_regex = "[^{0}]*([{0}]+)".format(scanner.letters) #move to const
+        if (pos == "v"):
+            head = template.args[1]
+            if (head.endswith("t")): #impersonal verbs
+                word.infl[0].set_feature("3")
+        head_regex = "[^{0}]*([{0}]+)([^&]*&lt;([^&]*))?".format(scanner.letters) #move to const
         #print (head_regex)
         head_match = re.match(head_regex, head)
         if (head_match is None): #should not happen
             #print ("no match? no match!")
             return word
         head = head_match.group(1)
+        code = head_match.group(3)
         if (head == "irreg"):
             return word
         word.text = head
@@ -194,8 +199,47 @@ def template_la_pos(word, template, pos=None):
         word.head = word.text
         if ("g" in template.params):
             word.infl[0].set_feature(template.params["g"])
+        elif (code is not None):
+            gender = gender_from_code(head, code)
+            word.infl[0].set_feature(gender)
+        if (isinstance(word.infl[0], data.Noun)):
+            base_noun_store[head] = word.infl[0]
     return word
-         
+
+def gender_from_code(head, code):
+    if (".M" in code):
+        return "m"
+    if (".F" in code):
+        return "f"
+    if (".N" in code):
+        return "n"
+    match(code[0]):
+        case "1":
+            if (head[-1] == "a" or head.endswith("ae")):
+                return "f"
+        case "2":
+            if (head[-1] in "sr"):
+                return "m"
+            if (head[-1] in "mn"):
+                return "n"
+        case "3":
+            if (head[-1] in ("oōx")):
+                return "f"
+            if (head[-1] in ("anel")):
+                return "n"
+            if (head[-1] == "s"):
+                if (head[-2] == "o"):
+                    return "m"
+                if (head[-2] in "ua"):
+                    return "n"
+        case "4":
+            if (head[-1] == "s"):
+                return "m"
+            else:
+                return "n"
+        case "5":
+            return "f"
+    return "NIHIL"
         
 
 def template_infl_of(word, template):
@@ -224,8 +268,13 @@ def template_infl_of(word, template):
     #store all sets and write each combination to a word
     sets.append(set)
     for set in sets:
+        grammar = None
         if (word.pos in data.grammar_from_pos):
             grammar = data.grammar_from_pos[word.pos]
+        if (isinstance(grammar, data.Noun)):
+            if (template.args[1] in base_noun_store):
+                grammar = base_noun_store[template.args[1]]
+        if (grammar is not None):
             set_to_infls(word, set, grammar)
     return word
 
