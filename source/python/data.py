@@ -51,7 +51,7 @@ class Tense(Feature):
 
 class Voice(Feature):
     ACTIVE = "actv"
-    PASSIVE = "pass"
+    PASSIVE = "pasv"
     
 class Mood(Feature):
     INDICATIVE = "indc"
