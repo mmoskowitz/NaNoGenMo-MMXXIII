@@ -195,7 +195,7 @@ class Adverb(Grammar):
 class Interjection(Grammar):
 
     def __str__(self):
-        return "adv"
+        return "intj"
     
     def matches(self, x):
         if not(isinstance(x, Interjection)):

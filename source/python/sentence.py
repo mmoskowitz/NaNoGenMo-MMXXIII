@@ -5,13 +5,14 @@ from dataclasses import dataclass, field
 import data
 import lexicon
 import random
+import sys
 
 sequences = {
     'base': ("subj", "subj-a", "obj", "obj-a", "adv", "verb",),
     'golden': ("subj", "obj", "verb", "subj-a", "obj-a",),
-    'simple': ("subj", "obj", "verb" ),
-    'simple_adv': ("subj", "obj", "adv", "verb"),
-    'intj': ("intj"),
+    'simple': ("subj", "obj", "verb",),
+    'simple_adv': ("subj", "obj", "adv", "verb",),
+    'intj': ("intj",),
 }
 
 sequence_weights = {
@@ -96,6 +97,8 @@ class Sentence():
             case("intj"):
                 infl = data.Interjection()
                 return infl
+            case _:
+                print (self.sequence, self.next_infl, file=sys.stderr)
 
 
     def get_adj(self, noun):

@@ -24,7 +24,7 @@ with open(filename) as file:
         i+= 1
         lexicon.parse_line(line)
         if (i % 50000 == 0):
-            #print (i)
+            print (i)
             if (debug and i > 100000):
                 break
 
@@ -74,6 +74,8 @@ for i in range(lines):
     temp_verse = build_line(base_hexameter,lexicon)
     if (temp_verse is not None):
         print (temp_verse)
+    else:
+        print ("No verse at ", i)
     
 
 
