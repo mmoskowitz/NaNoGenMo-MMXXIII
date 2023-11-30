@@ -175,4 +175,4 @@ As you can see, it has to do some work to complete the line!
 - Wiktionary is known not to have all its macrons correct.
 - I’ve certainly missed some of the subtleties of the Wiktionary grammatical tagging.
 
-Thanks to my wife Becca and my frequent collaborators @cdel, @loreleisakai, and @denismm for being very helpful sounding boards during this project!
+Thanks to my wife Becca and my frequent collaborators [@cdel](https://github.com/cdel), [@lorelei-sakai](https://github.com/lorelei-sakai), and [@denismm](https://github.com/denismm) for being very helpful sounding boards during this project!
