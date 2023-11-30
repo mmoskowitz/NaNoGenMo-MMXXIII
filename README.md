@@ -2,7 +2,7 @@
 
 This text is a myriad of epic nonsense.
 
-That is to say, this is 10,006 lines of Latin dactylic hexameter, which is syntactically and metrically valid, but which makes semantic sense only accidentally. From *Lȳsidamus spatham honōret holarcticus almam* (May Lysidamus from near the North Pole honor his nourishing sword)  to *Arachnae ballia depsant*, (Arachnes knead custodies) this has been composed by a program that makes use of a lexicon extracted from the Latin entries in Wiktionary, and assembles them like Mad-Libs into different sentence structures within the constraints of dactylic hexameter. There is no narrative and a very limited set of sentence structures, but it was an interesting exercise to build and I hope it is enjoyable to perceive, though I certainly wouldn’t recommend trying to read any large part of it.
+That is to say, this is 10,006 lines of Latin dactylic hexameter, which is syntactically and metrically valid, but which makes semantic sense only accidentally. From *Lȳsidamus spatham honōret holarcticus almam* (May Lysidamus from near the North Pole honor his nourishing sword)  to *Arachnae ballia depsant*, (Arachnes knead custodies) this has been composed by a program that makes use of a lexicon extracted from the Latin entries in Wiktionary, and assembles them like Mad-Libs into different sentence structures within the constraints of dactylic hexameter. There is no narrative and a very limited set of sentence structures, but it was an interesting exercise to build (and does not contain any machine learning) and I hope it is enjoyable, though I certainly wouldn’t recommend trying to read any large part of it.
 
 ## Project notes
 
