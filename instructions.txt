@@ -1,6 +1,7 @@
-download wiktionary article dump from https://wikimedia.mirror.clarkson.edu/enwiktionary/20231020/
-place in ./source-data-ignore
-decompress with bzip2 -d
+Download wiktionary article dump from https://wikimedia.mirror.clarkson.edu/enwiktionary/20231020/
+Place in ./source-data-ignore
+Decompress with bzip2 -d
+
 $ mkdir ./source-data-ignore/pages
 $ cd  ./source-data-ignore/pages
 $ csplit -k -n 10 ../enwiktionary-20231020-pages-articles.xml '/.*<page>.*/' '{8705923}' #Hi Zalgo!
@@ -27,5 +28,5 @@ $ cd ../analysis
 $ sed 's/{{/\n{{/g' alltext.txt > nltext.txt
 $ ../../source/python/clean-alltext.py nltext.txt > cleaned.txt
 $ ../../source/python/parse-alltext.py cleaned.txt  > parsed.csv
-$ ../../source/python/versifier.py parsed.csv 10000 
+$ ../../source/python/versifier.py parsed.csv 10000 > novel.txt
 

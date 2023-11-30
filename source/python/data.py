@@ -57,6 +57,7 @@ class Mood(Feature):
     INDICATIVE = "indc"
     SUBJUNCTIVE = "sub"
     IMPERATIVE = "impr"
+    INFINITIVE = "inf"
 
 @dataclass
 class Grammar:
@@ -285,5 +286,7 @@ def string_to_feature(value):
         return Voice(value)
     if value in Mood:
         return Mood(value)
+    if (value == "pl"):
+        return Number.PLURAL
     return None
     
