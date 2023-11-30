@@ -1,0 +1,184 @@
+=Lemma:=aucta
+
+==Latin==
+
+===Adjective===
+
+{{head|la|adjective form}}
+
+{{inflection of|la|auctus||nom//voc|f|s|;|nom//acc//voc|n|p}}
+
+===Adjective===
+
+{{head|la|adjective form|head=auctā}}
+
+{{inflection of|la|auctus||abl|f|s}}
+
+===Verb===
+
+{{head|la|verb form|head=auctā}}
+
+{{inflection of|la|auctō||2|s|pres|actv|impr}}
+
+=Lemma:=fusca
+
+==Latin==
+
+===Verb===
+
+{{head|la|verb form|head=fuscā}}
+
+{{inflection of|la|fuscō||2|s|pres|actv|impr}}
+
+===Adjective===
+
+{{head|la|adjective form}}
+
+{{inflection of|la|fuscus||nom//voc|f|s|;|nom//acc//voc|n|p}}
+
+=Lemma:=avidius
+
+==Latin==
+
+===Adverb===
+
+{{la-adv-comp|avidius}}
+
+=Lemma:=minime
+
+==Latin==
+
+{{la-IPA|minimē}}
+
+===Adverb===
+
+{{la-adv|minimē|-}}
+
+{{inflection of|la|parum||supd}}; [[least]] of all; very little
+
+=Lemma:=Aviliobris
+
+===Proper noun===
+
+{{la-proper noun|Aviliobris&lt;3.loc&gt;|g=f}}
+
+=Lemma:=uber
+
+==Latin==
+
+{{la-IPA|ūber}}
+
+===Noun===
+
+{{la-noun|ūber/ūber&lt;3.N&gt;}}
+
+===Adjective===
+
+===Adverb===
+
+{{la-adv|ūber}}
+
+=Lemma:=generose
+
+==Latin==
+
+===Adverb===
+
+{{la-adv|generōsē}}
+
+=Lemma:=Aaron
+
+==Latin==
+
+{{la-IPA|classical=no|Aarōn}}
+
+===Proper noun===
+
+{{la-proper noun|((Aarōn&lt;0&gt;,Aarōn&lt;3&gt;))|g=m}}
+
+=Lemma:=sumus
+
+==Latin==
+
+{{la-IPA}}
+
+===Verb===
+
+{{head|la|verb form}}
+
+{{inflection of|la|sum||1|p|pres|actv|indc}}
+
+=Lemma:=atrocissime
+
+==Latin==
+
+===Adverb===
+
+{{la-adv-sup|atrōcissimē}}
+
+=Lemma:=6ta
+
+==Latin==
+
+===Adjective===
+
+{{head|la|adjective form}}
+
+{{inflection of|la|6tus||nom//voc|f|s|;|nom//acc//voc|n|p}}
+
+===Adjective===
+
+{{head|la|adjective form|head=6tā}}
+
+{{inflection of|la|6tus||abl|f|s}}
+
+=Lemma:=Sutrium eo
+
+==Latin==
+
+{{la-IPA|Sūtrium eō}}
+
+===Verb===
+
+{{la-verb|prefix=[[Sūtrium]]|irreg.pass-impers|eō}}
+
+{{la-conj|prefix=[[Sūtrium]]|irreg.pass-impers|eō}}
+
+
+=Lemma:=terra
+
+==Latin==
+
+{{la-IPA}}
+
+===Noun===
+
+{{la-noun|terra&lt;1&gt;}}
+
+=Lemma:=virus
+
+==Latin==
+
+{{la-IPA|vīrus}}
+
+===Noun===
+
+{{la-noun|vīrus&lt;2.N.sg&gt;}}
+
+==Latin==
+
+{{la-IPA}}
+
+===Interjection===
+
+{{la-interj|abracadabra}}
+
+
+
+
+
+
+
+
+
+
